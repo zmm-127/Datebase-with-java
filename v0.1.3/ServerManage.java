@@ -25,7 +25,7 @@ public class ServerManage implements Runnable{
 		while(true) {
 			if(sn.hasNextLine()) {// 判断是否还有输入
 				line = sn.nextLine();
-				if(line.equals("shutdown")) {}
+				if(line.equals("shutdown")) {System.exit(0);}
 				else if(line.equals("showclientnum")) {//返回客户端用户个数
 					System.out.println(cm.getvSocket().size());
 				}
