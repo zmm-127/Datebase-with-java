@@ -1,0 +1,76 @@
+/**
+ * JavaCC template file created by SF JavaCC plugin 1.5.28+ wizard for JavaCC 1.5.0+
+ */
+options
+{
+  static = false;
+}
+
+PARSER_BEGIN(zmsql2)
+package zmsqlParse;
+import java.util.Vector;
+
+public class zmsql2
+{
+  public static void main(String args []) throws ParseException
+  {
+    zmsql2 parser = new zmsql2(System.in);
+    int j=0;
+    Vector v=new Vector();
+    try
+    { 
+    	v=parser.judge();
+    	j=1;
+    }
+    catch (Exception e)
+      {
+//        System.out.println(e.getMessage());
+      }
+
+	 if(0==j)
+	 {
+		System.out.println("匹配失败!");
+ 	 }
+ 	 else
+ 	 {
+		System.out.println("匹配成功!\n"+v.size());
+		try
+		{ 
+//			System.out.println(StaticMethod.calExpression(v).getString());
+		}
+		catch (Exception e)
+      	{
+        	System.out.println(e.getMessage());
+      	}
+ 	 }
+  }
+}
+
+PARSER_END(zmsql2)
+
+SKIP : {  " "| "\r"| "\t"| "\n"}
+TOKEN : {  < ADD : "+" >| < MINUS : "-" >| < MULTIPLY : "*" >| < DIVIDE : "/" >}
+TOKEN : {  < ICONSTANT : (< DIGIT >)+ >| < #DIGIT : [ "0"-"9" ] >| < EOL :";" >}
+
+Vector judge():
+{
+  Vector v=new Vector();
+  Token t;
+}
+{
+    t = <ICONSTANT>
+    {v.addElement(Integer.parseInt(t.image));}
+    (
+      (
+          <ADD>{v.addElement("+");}
+      	| < MINUS >{v.addElement("-");}
+        | < MULTIPLY >{v.addElement("*");}
+       	| < DIVIDE >{v.addElement("/");}
+      )
+        t = <ICONSTANT>{ v.addElement(Integer.parseInt(t.image));}
+    )*
+  <EOL>
+ {return v;}
+}
+
+
