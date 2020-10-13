@@ -9,6 +9,7 @@ options
 PARSER_BEGIN(zmsql2)
 package zmsqlParse;
 import java.util.Vector;
+import staticContent.*;
 
 public class zmsql2
 {
@@ -33,10 +34,10 @@ public class zmsql2
  	 }
  	 else
  	 {
-		System.out.println("匹配成功!\n"+v.size());
+		System.out.println("匹配成功!\n"+v.size());//输出表达式的大小即v数组的大小
 		try
 		{ 
-//			System.out.println(StaticMethod.calExpression(v).getString());
+			System.out.println("表达式的值为:"+StaticMethod.calSimpleExp(v));//调用栈来计算表达式的值
 		}
 		catch (Exception e)
       	{
