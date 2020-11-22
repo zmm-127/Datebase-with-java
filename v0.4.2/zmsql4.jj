@@ -315,7 +315,6 @@ TableConstraint GetTableConstraint() :
 			"(" t=< IDENTIFIER > ")" { tc.addElement(t.image); }
 		< REFERENCES > t=< IDENTIFIER > { tc.addElement(t.image); }//1--no action或restrict 
 			"(" t=< IDENTIFIER > ")" { tc.addElement(t.image); tc.addElement(1);tc.addElement(1);}
-			(
 				[  //级联删除                                     //1，1代表设置外键时更新和删除操作默认为1
 				LOOKAHEAD(2) < ON ><DELETE >
 				(< NOACTION > |< RESTRICT >|< SETNULL >{ tc.setElement(3,2); } |< CASCADE >{ tc.setElement(3,3); } )
@@ -324,7 +323,6 @@ TableConstraint GetTableConstraint() :
 			 	< ON ><UPDATE >
 				(< NOACTION > |< RESTRICT >|< SETNULL >{ tc.setElement(4,2); } |< CASCADE >{ tc.setElement(4,3); } )
 				]
-			)*
 		)	 
 	 )
 	)
