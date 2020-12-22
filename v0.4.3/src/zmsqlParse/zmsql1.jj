@@ -1,0 +1,47 @@
+/**
+ * JavaCC template file created by SF JavaCC plugin 1.5.28+ wizard for JavaCC 1.5.0+
+ */options{  static = false;}PARSER_BEGIN(zmsql1)package zmsqlParse;
+import java.util.Vector;
+
+public class zmsql1{  public static void main(String args []) throws ParseException  {    zmsql1 parser = new zmsql1(System.in);    int j=0;
+    Vector v=new Vector();
+    try
+    { 
+    	v=parser.judge();
+    	j=1;
+    }
+    catch (Exception e)
+      {
+//        System.out.println(e.getMessage());
+      }
+
+	 if(0==j)
+	 {
+		System.out.println("匹配失败!");
+ 	 }
+ 	 else
+ 	 {
+		System.out.println("匹配成功!共有"+(int)v.get(0)+"a,"+(int)v.get(1)+"b");
+		
+ 	 }
+  }
+}
+PARSER_END(zmsql1)SKIP :	{  " "| "\r"| "\t"| "\n"}
+
+TOKEN : {  < ACH : "a" >| < BCH : "b" >| < EOL : ";" >}
+
+Vector judge() :
+{
+ 	int an=0;
+ 	int bn=0;
+ 	Vector v=new Vector();
+}
+{
+  (<ACH> { an++;}|<BCH> { bn++;})* <EOL>
+	{
+//		System.out.println("a:"+an+" b:"+bn);
+		v.addElement(an);
+		v.addElement(bn);
+		return v;
+	}
+}

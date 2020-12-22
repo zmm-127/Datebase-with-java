@@ -1,0 +1,32 @@
+/**
+ * JavaCC template file created by SF JavaCC plugin 1.5.28+ wizard for JavaCC 1.5.0+
+ */options{  static = false;}PARSER_BEGIN(zmsql)package zmsqlParse;
+
+public class zmsql{  public static void main(String args []) throws ParseException  {    zmsql parser = new zmsql(System.in);
+    int j=0;    try
+    { 
+    	parser.judge();
+    	j=1;
+    }
+    catch (Exception e)
+      {
+//        System.out.println(e.getMessage());
+      }
+
+	 if(0==j)
+	 {
+		System.out.println("∆•≈‰ ß∞‹!");
+ 	 }
+ 	 else
+ 	 {
+		System.out.println("∆•≈‰≥…π¶!");	
+ 	 }
+  }
+}PARSER_END(zmsql)SKIP :	{  " "| "\r"| "\t"| "\n"}
+
+TOKEN :	{  < ACH : "a" >| < BCH : "b" >| < EOL : ";" >}
+
+void judge() :{}
+{
+  (<ACH><BCH>)* <EOL> 
+}

@@ -1,0 +1,211 @@
+/**
+ * JavaCC template file created by SF JavaCC plugin 1.5.28+ wizard for JavaCC 1.5.0+
+ */options{  static = false;}PARSER_BEGIN(zmsql3)package zmsqlParse;
+import java.util.Vector;
+import staticContent.*;
+import dataBase.*;
+
+public class zmsql3{  public static void main(String args []) throws ParseException  {    zmsql3 parser = new zmsql3(System.in);    int j=0;
+    Expression exp=new Expression();
+    try
+    { 
+    	parser.expression(exp);
+    	j=1;
+    }
+    catch (Exception e)
+      {
+//        System.out.println(e.getMessage());
+      }
+
+	 if(0==j)
+	 {
+		System.out.println("匹配失败!");
+ 	 }
+ 	 else
+ 	 {
+		System.out.println("匹配成功!表达式的大小为："+exp.getElements().size());
+		try
+		{ 
+			//System.out.println(StaticMethod.calExpression(exp.getElements()).getString());
+			
+		}
+		catch (Exception e)
+      	{
+        	System.out.println(e.getMessage());
+      	}
+ 	 }
+  }
+}PARSER_END(zmsql3)SKIP :	{  " "| "\r"| "\t"| "\n"}
+//算术运算 逻辑运算
+TOKEN : {  < ADD : "+" >| < MINUS : "-" >| < MULTIPLY : "*" >| < DIVIDE : "/" >| < MOD : "%" >
+			| < GREAT : ">" >| < LESS : "<" >| < EQUAL : "==" >| < AND : "and" >| < OR : "or" >| < NOT : "not" >}
+TOKEN : {   < ICONSTANT : (< DIGIT >)+ >						 //整数
+			| < FCONSTANT : (< DIGIT >)+ "." (< DIGIT >)* >		 //小数
+			| < 	IDENTIFIER :								//标识符
+    					< LETTER >
+    						(< LETTER > | < DIGIT >)* >
+			| < SCONSTANT : "'" ([ "a"-"z", "\\", "%", "_" ])* "'" >	//字符串
+			| < #LETTER : [ "a"-"z", "A"-"Z", "_" ] >| < #DIGIT : [ "0"-"9" ] >
+			| < EOL :";" >}
+
+String GetNumericOperator() : //算术运算符
+{
+  Token t;
+}
+{
+  ( t = < ADD >| t = < MINUS >| t = < MULTIPLY >| t = < DIVIDE >| t = < MOD >)
+  {
+    return t.image;
+  }
+}
+
+String GetLogicOperator() : //逻辑运算符
+{
+  Token t;
+}
+{
+  (t = < GREAT >| t = < LESS > | t = < EQUAL >| t = < AND >| t = < OR >)
+  {
+    return t.image;
+  }
+}
+
+void GetOperand(Expression exp) :  //将操作数传入exp数组中
+{
+  Token t;
+  Operand od = new Operand();
+  Operand odm = new Operand();
+  Variable var;
+  Function f;
+}
+{
+    [		//[]代表可选表示可匹配可不匹配
+      < MINUS >
+      {
+        odm.SetINT(-1);
+        exp.addElement(odm);
+        exp.addElement(Operator.get("*"));
+      }
+    ]
+    (
+	    t = < ICONSTANT > //整数
+	    {
+	      od.SetINT(Integer.parseInt(t.image));
+	      exp.addElement(od);
+	    }
+	    |
+	    t = < FCONSTANT > //浮点数
+	    {
+	      od.SetFLOAT( Float.parseFloat(t.image));
+	      exp.addElement(od);
+	    }
+		|
+	    t = < SCONSTANT >//字符串
+	    {
+	      od.SetSTRING(t.image);
+	      exp.addElement(od);
+	    }
+	    |LOOKAHEAD(2)     //函数
+	    f = GetFunction()
+    	{
+    	  exp.addElement(f);
+    	  //try{
+    	    //	exp.addElement(f.eval()); //f.eval()返回Operand
+    	   //}catch(Exception e) {
+    	    // 	e.printStackTrace();
+    	   //}
+    	}	
+	  	|
+	    t = < IDENTIFIER >//标识符
+	    {
+	      var=new Variable(t.image);
+	      exp.addElement(var);
+	    }
+	)
+	|//左括右括
+	(
+	  	"(" {      exp.addElement(Operator.get("("));    }
+			subexpression(exp)
+		")"  {     exp.addElement(Operator.get(")"));    }
+	)	   
+}
+
+void OpPart(Expression  exp) :  //将操作符传入exp数组中
+{
+  String opstr;
+}
+{
+  (
+    opstr = GetNumericOperator()
+    {
+      exp.addElement(Operator.get(opstr));
+    }
+  | opstr = GetLogicOperator()
+    {
+      exp.addElement(Operator.get(opstr));
+    }
+  )
+  GetOperand(exp)
+}
+
+void subexpression(Expression exp) :  //次级表达式，如包含在括号中
+{
+}
+{
+  GetOperand(exp)
+  (
+    LOOKAHEAD(2)
+    OpPart(exp)
+  )* 
+}
+
+void expression(Expression exp):   //表达式
+{
+}
+{
+  GetOperand(exp)
+  (
+    LOOKAHEAD(2)
+    OpPart(exp)
+  )* < EOL >
+}
+
+Expression ParsePartExpression() :
+{
+  Expression exp = new Expression();
+}
+{
+  subexpression(exp)
+  {
+    return exp;
+  }
+}
+
+Function GetFunction() :   //定义函数
+{
+  Function f;
+  Token t;
+  Expression exp;
+}
+{
+  t = < IDENTIFIER >
+  {			//将函数名称传递
+    f = Function.get(t.image);
+    f.SetName(t.image);
+  }
+  "("     //函数名后跟着()
+  exp = ParsePartExpression()  //函数名中的参数
+  {
+    f.AddParam(exp);
+  }
+  (
+    "," exp = ParsePartExpression()
+    {
+      f.AddParam(exp);
+    }
+  )*
+  ")"
+  {
+    return f;
+  }
+}
